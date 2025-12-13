@@ -41,16 +41,35 @@ def get_next_client():
 
 
 async def delete_message(chat_id: int, msg_id: int):
-    client = get_next_client()
-    try:
-        await client.delete_messages(
-            chat_id=chat_id,
-            message_ids=msg_id
-        )
-        await sleep(2)
-        LOGGER.info(f"Deleted message {msg_id} in {chat_id} using Client: {client.name}")
-    except FloodWait as e:
-        LOGGER.warning(f"FloodWait for {e.value} seconds while deleting message {msg_id} in {chat_id} using Client: {client.name}")
-        await sleep(e.value)
-    except Exception as e:
-        LOGGER.error(f"Error while deleting message {msg_id} in {chat_id} using Client: {client.name}: {e}")
+    # Determine max retries based on available clients
+    # +1 for Helper, and loop through all multi_clients if needed
+    max_retries = len(multi_clients) + 1 if multi_clients else 1
+    
+    for _ in range(max_retries):
+        client = get_next_client()
+        try:
+            await client.delete_messages(
+                chat_id=chat_id,
+                message_ids=msg_id
+            )
+            await sleep(2)
+            LOGGER.info(f"Deleted message {msg_id} in {chat_id} using Client: {client.name}")
+            return # Success, exit loop
+            
+        except FloodWait as e:
+            LOGGER.warning(f"FloodWait for {e.value} seconds while deleting message {msg_id} in {chat_id} using Client: {client.name}")
+            await sleep(e.value)
+            # We could retry with next client here to bypass wait, but let's stick to 403 handling for now 
+            # or maybe just continue? 
+            # If we wait, we might as well retry.
+            
+        except MessageDeleteForbidden:
+            LOGGER.warning(f"Client {client.name} has NO PERMISSION (403) to delete in {chat_id}. Retrying with next client...")
+            continue # Try next client
+            
+        except Exception as e:
+            LOGGER.error(f"Error while deleting message {msg_id} in {chat_id} using Client: {client.name}: {e}")
+            # If it's a generic error, maybe retry? Let's treat it as fatal for now unless permission related
+            break
+
+    LOGGER.error(f"Failed to delete message {msg_id} in {chat_id} after {max_retries} attempts.")
