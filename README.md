@@ -3,7 +3,6 @@
   <img src="https://iili.io/KhN0ztj.png" alt="Logo" width="400"/>
 </p>
 
-
 <p align="center">
   A powerful, self-hosted <b>Telegram Stremio Media Server</b> built with <b>FastAPI</b>, <b>MongoDB</b>, and <b>PyroFork</b> — seamlessly integrated with <b>Stremio</b> for automated media streaming and discovery.
 </p>
@@ -23,520 +22,187 @@
 ## 🧭 Quick Navigation
 
 - [🚀 Introduction](#-introduction)
-  - [✨ Key Features](#-key-features)
-- [⚙️ How It Works](#️-how-it-works)
-  - [Overview](#overview)
-  - [Upload Guidelines](#upload-guidelines)
-  - [Quality Replacement](#-quality-replacement-logic)
-  - [Updating CAMRip](#-updating-camrip-or-low-quality-files)
-  - [Behind The Scenes](#behind-the-scenes)
-- [🤖 Bot Commands](#-bot-commands)
-  - [Command List](#command-list)
-  - [`/set` Command Usage](#set-command-usage)
-- [🔧 Configuration Guide](#-configuration-guide)
-  - [🧩 Startup Config](#-startup-config)
-  - [🗄️ Storage](#️-storage)
-  - [🎬 API](#-api)
-  - [🌐 Server](#-server)
-  - [🔄 Update Settings](#-update-settings)
-  - [🔐 Admin Panel](#-admin-panel)
-  - [🧰 Additional CDN Bots (Multi-Token System)](#-additional-cdn-bots-multi-token-system)
-- [🚀 Deployment Guide](#-deployment-guide)
-  - [✅ Recommended Prerequisites](#-recommended-prerequisites)
-  - [🐙 Heroku Guide](#-heroku-guide)
-  - [🐳 VPS Guide (Recommended)](#-vps-guide)
+- [📝 Prerequisites & Variables](#-prerequisites--variables-how-to-get-them)
+- [☁️ Deployment (VPS Recommended)](#-deployment)
+- [🔐 Access Management (Tokens)](#-access-management--tokens)
 - [📺 Setting up Stremio](#-setting-up-stremio)
-  - [🌐 Add the Addon](#-step-3-add-the-addon)
-  - [⚙️ Optional: Remove Cinemeta](#️-optional-remove-cinemeta)
-- [🏅 Contributor](#-contributor)
+- [🤖 Bot Commands](#-bot-commands)
+- [⚙️ Environment Variables](#-environment-variables)
 
+---
 
 # 🚀 Introduction
 
-This project is a **next-generation Telegram Stremio Media Server** that allows you to **stream your Telegram files directly through Stremio**, without any third-party dependencies or file expiration issues. It’s designed for **speed, scalability, and reliability**, making it ideal for both personal and community-based media hosting.
+This project is a **next-generation media server** that bridges **Telegram** and **Stremio**. It allows you to index files from your Telegram channels and stream them directly on Stremio devices (TVs, Phones, PC) with **zero transcoding** and **no file expiration**.
 
-
-## ✨ Key Features
-
-- ⚙️ **Multiple MongoDB Support** 
-- 📡 **Multiple Channel Support** 
-- ⚡ **Fast Streaming Experience**
-- 🔑 **Multi Token Load Balancer** 
-- 🎬 **IMDB and TMDB Metadata Integration** 
-- ♾️ **No File Expiration** 
-- 🧠 **Admin Panel Support** 
-
-
-## ⚙️ How It Works
-
-This project acts as a **bridge between Telegram storage and Stremio streaming**, connecting **Telegram**, **FastAPI**, and **Stremio** to enable seamless movie and TV show streaming directly from Telegram files.
-
-### Overview
-
-When you **forward Telegram files** (movies or TV episodes) to your **AUTH CHANNEL**, the bot automatically:
-
-1.  🗃️ **Stores** the `message_id` and `chat_id` in the database.
-2.  🧠 **Processes** file captions to extract key metadata (title, year, quality, etc.).
-3.  🌐 **Generates a streaming URL** through the **PyroFork** module — routed by **FastAPI**.
-4.  🎞️ **Provides Stremio Addon APIs**:
-    -   `/catalog` → Lists available media
-    -   `/meta` → Shows detailed information for each item
-    -   `/stream` → Streams the file directly via Telegram
-
-### Upload Guidelines
-
-To ensure proper metadata extraction and seamless integration with **Stremio**, all uploaded Telegram media files **must include specific details** in their captions.
-
-#### 🎥 For Movies
-
-**Example Caption:**
-
-```
-Ghosted 2023 720p 10bit WEBRip [Org APTV Hindi AAC 2.0CH + English 6CH] x265 HEVC Msub ~ PSA.mkv
-```
-
-**Required Fields:**
-
--   🎞️ **Name** – Movie title (e.g., _Ghosted_)
--   📅 **Year** – Release year (e.g., _2023_)
--   📺 **Quality** – Resolution or quality (e.g., _720p_, _1080p_, _2160p_)
-
-✅ **Optional:** Include codec, audio format, or source (e.g., `WEBRip`, `x265`, `Dual Audio`).
-
-#### 📺 For TV Shows
-
-**Example Caption:**
-
-```
-Harikatha.Sambhavami.Yuge.Yuge.S01E04.Dark.Hours.1080p.WEB-DL.DUAL.DDP5.1.Atmos.H.264-Spidey.mkv
-````
-
-**Required Fields:**
-
--   🎞️ **Name** – TV show title (e.g., _Harikatha Sambhavami Yuge Yuge_)
--   📆 **Season Number** – Use `S` followed by two digits (e.g., `S01`)
--   🎬 **Episode Number** – Use `E` followed by two digits (e.g., `E04`)
--   📺 **Quality** – Resolution or quality (e.g., _1080p_, _720p_)
-
-✅ **Optional:** Include episode title, codec, or audio details (e.g., `WEB-DL`, `DDP5.1`, `Dual Audio`).
-
-### 🔁 Quality Replacement Logic
-
-When you upload multiple files with the **same quality label** (like `720p` or `1080p`),
-the **latest file automatically replaces the old one**.
-
-> Example:
-> If you already uploaded `Ghosted 2023 720p` and then upload another `720p` version,
-> the bot **replaces the old file** to keep your catalog clean and organized.
-
-This helps avoid duplicate entries in Stremio and ensures only the most recent file is used.
+### ✨ Key Features
+- ⚡ **Direct Streaming**: Streams directly from Telegram servers to your device.
+- 🔐 **Token System**: Secure your server with per-user usage limits and analytics.
+- 🗄️ **Database Support**: Uses MongoDB for persistent metadata storage.
+- 🔄 **Smart Indexing**: Automatically replaces low-quality files (CAM/TS) with high-quality ones (1080p/4K).
+- 📡 **Load Balancing**: Supports multiple bot tokens to bypass Telegram's flood limits.
 
 ---
 
-### 🆙 Updating CAMRip or Low-Quality Files
+# 📝 Prerequisites & Variables (How to get them)
 
-If you initially uploaded a **CAMRip or low-quality version**, you can easily replace it with a better one:
+Before deploying, you need to gather a few keys. Here is how to find them:
 
-1. Forward the **new, higher-quality file** (e.g., `1080p`, `WEB-DL`) to your **AUTH CHANNEL**.
-2. The bot will **automatically detect and replace** the old CAMRip file in the database.
-3. The Stremio addon will then **update automatically**, showing the new stream source.
+### 1. Telegram API Keys (`API_ID`, `API_HASH`)
+1. Go to [my.telegram.org](https://my.telegram.org) and log in.
+2. Click on **API development tools**.
+3. Create a new application (name it anything).
+4. Copy the **App api_id** and **App api_hash**.
 
-✅ No manual deletion or command is needed — forwarding the updated file is enough!
+### 2. Bot Tokens (`BOT_TOKEN`, `HELPER_BOT_TOKEN`)
+1. Open Telegram and search for **@BotFather**.
+2. Send `/newbot` and follow the instructions to create your **Main Bot**.
+3. Copy the HTTP API Token -> This is your `BOT_TOKEN`.
+4. Send `/newbot` again to create a **Helper Bot** (used for background tasks).
+5. Copy its token -> This is your `HELPER_BOT_TOKEN`.
+
+### 3. MongoDB URI (`DATABASE`)
+1. Create a free account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Create a **Cluster** (free tier works fine).
+3. In **Database Access**, create a user (e.g., `admin`) and password.
+4. In **Network Access**, allow access from `0.0.0.0/0` (Anywhere).
+5. Click **Connect** -> **Drivers** -> Copy the Connection String.
+   - It looks like: `mongodb+srv://admin:password@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority`
+
+### 4. Channel ID (`AUTH_CHANNEL`)
+1. Create a **Telegram Channel** (or use an existing one).
+2. Add **both** your bots (Main + Helper) as **Admins** in this channel.
+3. Forward a message from this channel to a bot like **@Rose** or **@GetIDs Bot** to find the numeric ID.
+   - It usually starts with `-100...` (e.g., `-1001234567890`).
 
 ---
 
-
-### Behind The Scenes
-
-Here's how each component interacts:
-
-| Component | Role |
-| :--- | :--- |
-| **Telegram Bot** | Handles uploads, forwards, and file tracking. |
-| **MongoDB** | Stores message IDs, chat IDs, and metadata. |
-| **PyroFork** | Generates Telegram-based streaming URLs. |
-| **FastAPI** | Hosts REST endpoints for streaming, catalog, and metadata. |
-| **Stremio Addon** | Consumes FastAPI endpoints for catalog display and playback. |
-
-📦 **Flow Summary:**
-
-```
-Telegram ➜ MongoDB ➜ FastAPI ➜ Stremio ➜ User Stream
-```
-
-
-
-# 🤖 Bot Commands
-
-Below is the list of available bot commands and their usage within the Telegram bot.
-
-### Command List
-
-| Command | Description |
-| :--- | :--- |
-| **`/start`** | Returns your **Addon URL** for direct installation in **Stremio**. |
-| **`/log`** | Sends the latest **log file** for debugging or monitoring. |
-| **`/set`** | Used for **manual uploads** by linking IMDB URLs. |
-| **`/restart`** | Restarts the bot and pulls any **latest updates** from the upstream repository. |
-
-### `/set` Command Usage
-
-The `/set` command is used to manually upload a specific Movie or TV show to your channel, linking it to its IMDB metadata.
-
-**Command:**
-
-```
-/set <imdb-url>
-```
-
-**Example:**
-
-```
-/set https://m.imdb.com/title/tt665723
-```
-
-**Steps:**
-
-1.  Send the `/set` command followed by the **IMDB URL** of the movie or show you want to upload.
-2.  **Forward the related movie or TV show files** to your channel.
-3.  Once all files are uploaded, **clear the default IMDB link** by simply sending the `/set` command without any URL.
-
-💡 **Tip:** Use `/log` if you encounter any upload or parsing issues.
-
-
-# 🔧 Configuration Guide
-
-All environment variables for this project are defined in the `config.env` file. A detailed explanation of each parameter is provided below.
-
-### 🧩 Startup Config
-
-| Variable | Description |
-| :--- | :--- |
-| **`API_ID`** | Your Telegram **API ID** from [my.telegram.org](https://my.telegram.org). Used for authenticating your Telegram session. |
-| **`API_HASH`** | Your Telegram **API Hash** from [my.telegram.org](https://my.telegram.org). |
-| **`BOT_TOKEN`** | The main bot’s **access token** from [@BotFather](https://t.me/BotFather). Handles user requests and media fetching. |
-| **`HELPER_BOT_TOKEN`** | **Secondary bot token** used to assist the main bot with tasks like deleting, editing, or managing. |
-| **`OWNER_ID`** | Your **Telegram user ID**. This ID has full administrative access. |
-
-### 🗄️ Storage
-
-| Variable | Description |
-| :--- | :--- |
-| **`AUTH_CHANNEL`** | One or more **Telegram channel IDs** (comma-separated) where the bot is authorized to fetch or stream content. *Example: `-1001234567890, -1009876543210`*. |
-| **`DATABASE`** | MongoDB Atlas connection URI(s). You **must provide at least two databases**, separated by commas (`,`) for load balancing and redundancy. <br>Example: <br>`mongodb+srv://user:pass@cluster0.mongodb.net/db1, mongodb+srv://user:pass@cluster1.mongodb.net/db2` |
-
-> 💡 **Tip:** Create your MongoDB Atlas cluster [here](https://www.mongodb.com/cloud/atlas).
-
-### 🎬 API
-
-| Variable | Description |
-| :--- | :--- |
-| **`TMDB_API`** | Your **TMDB API key** from [themoviedb.org](https://www.themoviedb.org/settings/api). Used to fetch movie and TV metadata. |
-
-### 🌐 Server
-
-| Variable | Description |
-| :--- | :--- |
-| **`BASE_URL`** | The Domain or Heroku app URL (e.g. `https://your-domain.com`). Crucial for Stremio addon setup. |
-| **`PORT`** | The port number on which your FastAPI server will run. *Default: `8000`*. |
-
-### 🔄 Update Settings
-
-| Variable | Description |
-| :--- | :--- |
-| **`UPSTREAM_REPO`** | GitHub repository URL for automatic updates. |
-| **`UPSTREAM_BRANCH`** | The branch name to track in your upstream repo. *Default: `master`*. |
-
-### 🔐 Admin Panel
-
-| Variable | Description |
-| :--- | :--- |
-| **`ADMIN_USERNAME`** | Username for logging into the Admin Panel. |
-| **`ADMIN_PASSWORD`** | Password for Admin Panel access.|
- **⚠️ Change from default values for security.** 
-
-### 🧰 Additional CDN Bots (Multi-Token System)
-
-| Variable | Description |
-| :--- | :--- |
-| **`MULTI_TOKEN1`**, **`MULTI_TOKEN2`**, ... | Extra bot tokens used to distribute traffic and prevent Telegram rate-limiting. Add each bot as an **Admin** in your `AUTH_CHANNEL`(s). |
-
-#### About `MULTI_TOKEN`
-
-If your bot handles a high number of downloads/requests at a time, Telegram may limit your main bot.  
-To avoid this, you can use **MULTI_TOKEN** system:
-
-- Create multiple bots using [@BotFather](https://t.me/BotFather).
-- Add each bot as **Admin** in your `AUTH_CHANNEL`(s).
-- Add the tokens in your `config.env` as `MULTI_TOKEN1`, `MULTI_TOKEN2`, `MULTI_TOKEN3`, and so on.
-- The system will automatically distribute the load among all these bots!
-
-
-# 🚀 Deployment Guide
-
-This guide will help you deploy your **Telegram Stremio Media Server** using either Heroku or a VPS with Docker.
-
-## ✅ Recommended Prerequisites
-
-**Supported Servers:**
-
-  - 🟣 **Heroku**
-  - 🟢 **VPS** 
-
-Before you begin, ensure you have:
-
-1.  ✅ A **VPS** with a public IP (e.g., Ubuntu on DigitalOcean, AWS, Vultr, etc.)
-2.  ✅ A **Domain name**
-
-
-## 🐙 Heroku Guide
-
-Follow the instructions provided in the Google Colab Tool to deploy on Heroku.
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/weebzone/Colab-Tools/blob/main/telegram%20stremio.ipynb)
-
-
-## 🐳 VPS Guide
-
-This section explains how to deploy your **Telegram Stremio Media Server** on a VPS using **Docker Compose (recommended)** or **Docker**.
-
-
-### 1️⃣ Step 1: Clone & Configure the Project
-
-```bash
-git clone https://github.com/weebzone/Telegram-Stremio
-cd Telegram-Stremio
-mv sample_config.env config.env
-nano config.env
-```
-
-* Fill in all required variables in `config.env`.
-* Press `Ctrl + O`, then `Enter`, then `Ctrl + X` to save and exit.
-
-## ⚙️ Step 2: Choose Your Deployment Method
-
-You can deploy the server using either **Docker Compose (recommended)** or **plain Docker**.
-
-
-
-### 🟢 **Option 1: Deploy with Docker Compose (Recommended)**
-
-Docker Compose provides an easier and more maintainable setup, environment mounting, and restart policies.
-
-#### 🚀 Start the Container
-
-```bash
-docker compose up -d
-```
-
-Your server will now be running at:
-➡️ `http://<your-vps-ip>:8000`
+# ☁️ Deployment
+
+> [!IMPORTANT]
+> **VPS (Virtual Private Server) is strongly recommended.**
+> Free platforms like Heroku/Render put apps to sleep and have strict bandwidth/resource limits which cause buffering. A cheap VPS ($5/mo) ensures 24/7 uptime and smooth streaming.
+
+### 🐧 VPS Guide (Docker Compose) - **PREFERRED**
+
+1.  **Clone the Repository**:
+    ```bash
+    git clone https://github.com/weebzone/Telegram-Stremio
+    cd Telegram-Stremio
+    ```
+
+2.  **Configure Environment**:
+    ```bash
+    cp sample_config.env config.env
+    nano config.env
+    ```
+    *Fill in the variables you gathered in the previous step.*
+
+3.  **Start the Server**:
+    ```bash
+    docker compose up -d
+    ```
+
+    Your server is now running at: `http://<YOUR_VPS_IP>:8000`
+
+### 🌐 Domain & HTTPS (Optional but Recommended)
+Stremio requires HTTPS for many add-ons. To add HTTPS easily:
+
+1.  Point your domain's **A Record** to your VPS IP.
+2.  Install **Caddy** (Automatic HTTPS):
+    ```bash
+    sudo apt install -y caddy
+    ```
+3.  Edit Caddyfile:
+    ```bash
+    sudo nano /etc/caddy/Caddyfile
+    ```
+    ```
+    your-domain.com {
+        reverse_proxy localhost:8000
+    }
+    ```
+4.  Reload Caddy:
+    ```bash
+    sudo systemctl reload caddy
+    ```
+
+Your API is now at: `https://your-domain.com`
 
 ---
 
-#### 🛠️ Update `config.env` While Running
+# 🔐 Access Management (Tokens)
 
-If you need to modify environment values (like `BASE_URL`, `AUTH_CHANNEL`, etc.):
+To protect your server from unauthorized usage, this project uses a **Token System**.
 
-1. **Edit the file:**
+1.  **Login to Dashboard**:
+    - Go to `https://your-domain.com/login` (or `http://ip:8000/login`).
+    - Use the `ADMIN_USERNAME` and `ADMIN_PASSWORD` from your config.
 
-   ```bash
-   nano config.env
-   ```
-2. **Save your changes:** (`Ctrl + O`, `Enter`, `Ctrl + X`)
-3. **Restart the container to apply updates:**
+2.  **Create a User Token**:
+    - Click **"New Token"**.
+    - Enter a name (e.g., "Friend's TV").
+    - **Set Limits (Optional)**: You can restrict daily/monthly bandwidth (e.g., 2GB Daily).
+    - Click **Create**.
 
-   ```bash
-   docker compose restart
-   ```
+3.  **Get Stremio Link**:
+    - In the table, click **Copy Link**.
+    - This link (`https://.../stremio/<token>/manifest.json`) is what you give to the user.
 
-⚡ Since the config file is mounted, you **don’t need to rebuild** the image — changes apply automatically on restart.
+> [!TIP]
+> If a user exceeds their limit, their stream will stop immediately to save bandwidth.
 
-
-
-### 🔵 **Option 2: Deploy with Docker (Manual Method)**
-
-If you prefer not to use Docker Compose, you can manually build and run the container.
-
-#### 🧩 Build the Image
-
-```bash
-docker build -t telegram-stremio .
-```
-
-#### 🚀 Run the Container
-
-```bash
-docker run -d -p 8000:8000 telegram-stremio
-```
-
-Your server should now be running at:
-➡️ `http://<your-vps-ip>:8000`
-
-
-
-### 🌐 Step 3: Add Domain (Required)
-
-#### 🅰️ Set Up DNS Records
-
-Go to your domain registrar and add an **A record** pointing to your VPS IP:
-
-| Type | Name | Value             |
-| ---- | ---- | ----------------- |
-| A    | @    | `195.xxx.xxx.xxx` |
-
-
-#### 🧱 Install Caddy (for HTTPS + Reverse Proxy)
-
-```bash
-sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
-chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-chmod o+r /etc/apt/sources.list.d/caddy-stable.list
-sudo apt update
-sudo apt install caddy
-```
-
-#### ⚙️ Configure Caddy
-
-1. **Edit the Caddyfile:**
-
-   ```bash
-   sudo nano /etc/caddy/Caddyfile
-   ```
-
-2. **Replace contents with:**
-
-   ```caddy
-   your-domain.com {
-       reverse_proxy localhost:8000
-   }
-   ```
-
-   * Replace `your-domain.com` with your actual domain name.
-   * Adjust the port if you changed it in `config.env`.
-
-3. **Save and reload Caddy:**
-
-   ```bash
-   sudo systemctl reload caddy
-   ```
-
-
-✅ Your API will now be available securely at:
-➡️ `https://your-domain.com`
-
+---
 
 # 📺 Setting up Stremio
 
-Follow these steps to connect your deployed addon to the **Stremio** app.
+Now that you have your **Tokenized Stremio Link**:
 
-### 📥 Step 1: Download Stremio
+1.  Open **Stremio** on your device (PC/Mobile/TV).
+2.  Go to the **Addons** tab.
+3.  Paste your **Copied Link** into the search bar.
+4.  Click **Install**.
 
-Download Stremio for your device:
-👉 [https://www.stremio.com/downloads](https://www.stremio.com/downloads)
+🎉 **Done!** You will now see your Telegram files appear in Stremio search results.
 
-### 👤 Step 2: Sign In
+---
 
-  - Create or log in to your **Stremio account**.
+# 🤖 Bot Commands
 
-### 🌐 Step 3: Add the Addon
+Interact with your bot in Telegram:
 
-1.  Open the **Stremio App**.
-2.  Go to the **Addon Section** (usually represented by a puzzle piece icon 🧩).
-3.  In the search bar, paste the appropriate addon URL:
-
-| Deployment Method | Addon URL |
+| Command | Description |
 | :--- | :--- |
-| **Heroku** | `https://<your-heroku-app>.herokuapp.com/stremio/manifest.json` |
-| **Custom Domain** | `https://<your-domain>/stremio/manifest.json` |
+| `/start` | Check if bot is alive. |
+| `/log` | Get system log file (Admin only). |
+| `/set <imdb_url>` | **Index a Movie/Series**. Send command -> Forward files -> Send `/set` again to finish. |
+| `/delete` | Reply to a file in the channel to delete it from DB. |
 
+**How to Index Content:**
+1.  Send `/set https://www.imdb.com/title/tt123456/` to the bot.
+2.  **Forward** the video files from your channel to the bot (or the channel itself, depending on configured permissions).
+3.  Send `/set` again to save.
 
-## ⚙️ Optional: Remove Cinemeta
+---
 
-If you want to use **only** your **Telegram Stremio Media Server addon** for metadata and streaming, follow this guide to remove the default `Cinemeta` addon.
+# ⚙️ Environment Variables
 
-### 1️⃣ Step 1: Uninstall Other Addons
+Full list of variables in `config.env`:
 
-1.  Go to the **Addon Section** in the Stremio App.
-2.  **Uninstall all addons** except your Telegram Stremio Media Server.
-3.  Attempt to remove **Cinemeta**. If Stremio prevents it, proceed to Step 2.
+| Variable | Description |
+| :--- | :--- |
+| `API_ID` | Telegram API ID. |
+| `API_HASH` | Telegram API Hash. |
+| `BOT_TOKEN` | Main Bot Token. |
+| `HELPER_BOT_TOKEN` | Helper Bot Token. |
+| `OWNER_ID` | Your numeric Telegram ID (for admin commands). |
+| `AUTH_CHANNEL` | Channel ID to index files from (e.g. `-100xxxx`). |
+| `DATABASE` | MongoDB Connection URI. |
+| `BASE_URL` | Domain or IP with protocol (e.g. `https://my-stremio.com`). |
+| `TMDB_API` | (Optional) For better metadata fetching. |
 
-### 2️⃣ Step 2: Remove “Cinemeta” Protection
+---
 
-1.  Log in to your **Stremio account** using **Chrome or Chromium-based browser** :
-    👉 [https://web.stremio.com/](https://web.stremio.com/)
-2.  Once logged in, open your **browser console** (`Ctrl + Shift + J` on Windows/Linux or `Cmd + Option + J` on macOS).
-3.  Copy and paste the code below into the console and press **Enter**:
-
-<!-- end list -->
-
-```js
-(function() {
-
-	const token = JSON.parse(localStorage.getItem("profile")).auth.key;
-
-    const requestData = {
-        type: "AddonCollectionGet",
-        authKey: token,
-        update: true
-    };
-
-    fetch('https://api.strem.io/api/addonCollectionGet', {
-        method: 'POST',
-        body: JSON.stringify(requestData)
-    })
-    .then(response => response.json())
-    .then(data => {
-
-    if (data && data.result) {
-
-        let result = JSON.stringify(data.result).substring(1).replace(/"protected":true/g, '"protected":false').replace('"idPrefixes":["tmdb:"]', '"idPrefixes":["tmdb:","tt"]');
-            
-        const index = result.indexOf("}}],");
-            
-        if (index !== -1) {
-            result = result.substring(0, index + 3) + "}";
-        }
-
-		let addons = '{"type":"AddonCollectionSet","authKey":"' + token + '",' + result;
-
-		fetch('https://api.strem.io/api/addonCollectionSet', {
-    		method: 'POST',
-			body: addons 
-		})
-      	.then(response => response.text())
-      	.then(data => {
-      		console.log('Success:', data);
-      	})
-      	.catch((error) => {
-      		console.error('Error:', error);
-      	});
-
-        } else {
-            console.error('Error:', error);
-        }
-    })
-    .catch((error) => {
-        console.error('Erro:', error);
-    });
-})();
-```
-
-### 3️⃣ Step 3: Confirm Success
-
-  - Wait until you see this message in the console:
-    ```
-    Success: {"result":{"success":true}}
-    ```
-  - Refresh the page (**F5**). You will now be able to **remove Cinemeta** from your addons list.
-
-
-## 🏅 **Contributor**
-
-|<img width="80" src="https://avatars.githubusercontent.com/u/113664541">|<img width="80" src="https://avatars.githubusercontent.com/u/13152917">|<img width="80" src="https://avatars.githubusercontent.com/u/14957082">|
-|:---:|:---:|:---:|
-|[`Karan`](https://github.com/Weebzone)|[`Stremio`](https://github.com/Stremio)|[`ChatGPT`](https://github.com/OPENAI)|
-|Author|Stremio SDK|Refactor
-
+<p align="center">
+  Made with ❤️ by the Open Source Community
+</p>

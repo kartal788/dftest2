@@ -17,6 +17,10 @@ Port = Telegram.PORT
 # Configure Logging to suppress ProtocolError
 log_config = copy.deepcopy(uvicorn.config.LOGGING_CONFIG)
 
+# Ensure 'filters' key exists
+if "filters" not in log_config:
+    log_config["filters"] = {}
+
 # 1. Add Filter Definition
 log_config["filters"]["protocol_filter"] = {
     "()": "Backend.fastapi.ProtocolErrorFilter"
