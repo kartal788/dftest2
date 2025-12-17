@@ -22,14 +22,18 @@
                 <!-- System Status Card -->
                 <div class="theme-card rounded-xl p-8 shadow-xl">
                     <div class="flex items-center mb-6">
-                        <div class="w-12 h-12 theme-primary rounded-lg flex items-center justify-center mr-4 bg-opacity-20 text-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="white">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        <div
+                            class="w-12 h-12 theme-primary rounded-lg flex items-center justify-center mr-4 bg-opacity-20 text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                stroke="white">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                </path>
                             </svg>
                         </div>
                         <h3 class="text-2xl font-semibold">System Status</h3>
                     </div>
-                    
+
                     <div class="space-y-4">
                         <div class="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
                             <span class="font-medium theme-text-secondary">Uptime</span>
@@ -37,7 +41,8 @@
                         </div>
                         <div class="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
                             <span class="font-medium theme-text-secondary">Telegram Bot</span>
-                            <span class="text-primary font-semibold">{{ system_stats.telegram_bot or '@StreamBot' }}</span>
+                            <span class="text-primary font-semibold">{{ system_stats.telegram_bot or '@StreamBot'
+                                }}</span>
                         </div>
                         <div class="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
                             <span class="font-medium theme-text-secondary">Connected Bots</span>
@@ -52,36 +57,46 @@
 
                 <!-- Bot Workload Accordion (Collapsed by default) -->
                 <div class="theme-card rounded-xl p-8 shadow-xl">
-                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleAccordion('workload-content')">
+                    <div class="flex items-center justify-between cursor-pointer"
+                        onclick="toggleAccordion('workload-content')">
                         <div class="flex items-center">
-                            <div class="w-12 h-12 theme-primary rounded-lg flex items-center justify-center mr-4 bg-opacity-20 text-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="white">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            <div
+                                class="w-12 h-12 theme-primary rounded-lg flex items-center justify-center mr-4 bg-opacity-20 text-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="white">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                 </svg>
                             </div>
                             <h3 class="text-2xl font-semibold">Bot Workloads</h3>
                         </div>
-                        <svg id="workload-content-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary transition-transform duration-200 transform rotate-0" fill="none" viewBox="0 0 24 24" stroke="white">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        <svg id="workload-content-icon" xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5 text-primary transition-transform duration-200 transform rotate-0"
+                            fill="none" viewBox="0 0 24 24" stroke="white">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
                         </svg>
                     </div>
-                    
+
                     <div id="workload-content" class="hidden mt-6 space-y-3">
                         {% if system_stats.loads and system_stats.loads|length > 0 %}
-                            {% for bot_name, load in system_stats.loads.items() %}
-                            <div class="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
-                                <span class="font-medium theme-text-secondary">{{ bot_name }}</span>
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-16 bg-gray-200 rounded-full h-2">
-                                        {% set max_load = system_stats.loads.values() | max if system_stats.loads.values() | max > 0 else 1 %}
-                                        <div class="theme-primary h-2 rounded-full" style="width: {{ (load / max_load * 100) | round }}%"></div>
-                                    </div>
-                                    <span class="text-primary font-semibold text-sm w-8" id="load-{{ loop.index0 }}">{{ load }}</span>
+                        {% for bot_name, load in system_stats.loads.items() %}
+                        <div class="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
+                            <span class="font-medium theme-text-secondary">{{ bot_name }}</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                    {% set max_load = system_stats.loads.values() | max if system_stats.loads.values() |
+                                    max > 0 else 1 %}
+                                    <div class="theme-primary h-2 rounded-full"
+                                        style="width: {{ (load / max_load * 100) | round }}%"></div>
                                 </div>
+                                <span class="text-primary font-semibold text-sm w-8" id="load-{{ loop.index0 }}">{{ load
+                                    }}</span>
                             </div>
-                            {% endfor %}
+                        </div>
+                        {% endfor %}
                         {% else %}
-                            <div class="text-center theme-text-secondary py-4">No workload data available</div>
+                        <div class="text-center theme-text-secondary py-4">No workload data available</div>
                         {% endif %}
                     </div>
                 </div>
@@ -93,41 +108,45 @@
             <h2 class="text-2xl font-bold mb-6">Database Overview</h2>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% if system_stats.databases %}
-                    {% for db_stat in system_stats.databases %}
-                    <div class="theme-card rounded-xl p-6 shadow-xl">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold">{{ db_stat.db_name.replace("storage_", "Database ") }}</h3>
-                            <div class="w-8 h-8 theme-primary rounded-lg flex items-center justify-center bg-opacity-20 text-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="white">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
-                                </svg>
-                            </div>
+                {% for db_stat in system_stats.databases %}
+                <div class="theme-card rounded-xl p-6 shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">{{ db_stat.db_name.replace("storage_", "Database ") }}</h3>
+                        <div
+                            class="w-8 h-8 theme-primary rounded-lg flex items-center justify-center bg-opacity-20 text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                stroke="white">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
+                                </path>
+                            </svg>
                         </div>
-                        
-                        <div class="space-y-3">
-                            <div class="flex justify-between text-sm">
-                                <span class="theme-text-secondary">Movies</span>
-                                <span class="text-primary font-semibold">{{ "{:,}".format(db_stat.movie_count) }}</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="theme-text-secondary">Movies</span>
+                            <span class="text-primary font-semibold">{{ "{:,}".format(db_stat.movie_count) }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="theme-text-secondary">TV Shows</span>
+                            <span class="text-primary font-semibold">{{ "{:,}".format(db_stat.tv_count) }}</span>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="theme-text-secondary">Storage Used</span>
+                                <span class="text-xs">{{ "%.1f"|format(db_stat.storageSize / 1024 / 1024) }} MB</span>
                             </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="theme-text-secondary">TV Shows</span>
-                                <span class="text-primary font-semibold">{{ "{:,}".format(db_stat.tv_count) }}</span>
-                            </div>
-                            <div class="mt-4">
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span class="theme-text-secondary">Storage Used</span>
-                                    <span class="text-xs">{{ "%.1f"|format(db_stat.storageSize / 1024 / 1024) }} MB</span>
-                                </div>
-                                {% set storage_percent = (db_stat.storageSize / (500 * 1024 * 1024) * 100) | round %}
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="theme-primary h-2 rounded-full" style="width: {{ storage_percent }}%"></div>
-                                </div>
+                            {% set storage_percent = (db_stat.storageSize / (500 * 1024 * 1024) * 100) | round %}
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="theme-primary h-2 rounded-full" style="width: {{ storage_percent }}%"></div>
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
+                </div>
+                {% endfor %}
                 {% else %}
-                    <div class="col-span-full text-center theme-text-secondary py-8">No database statistics available</div>
+                <div class="col-span-full text-center theme-text-secondary py-8">No database statistics available</div>
                 {% endif %}
             </div>
         </div>
@@ -136,41 +155,58 @@
         <div class="mb-12">
             <h2 class="text-2xl font-bold mb-6">Media Management</h2>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="/media/manage?media_type=movie" class="block theme-card rounded-xl p-8 shadow-xl hover:shadow-2xl transition-all group">
+                <a href="/media/manage?media_type=movie"
+                    class="block theme-card rounded-xl p-8 shadow-xl hover:shadow-2xl transition-all group">
                     <div class="flex items-center">
-                        <div class="w-16 h-16 theme-primary rounded-lg flex items-center justify-center mr-6 group-hover:scale-110 transition-transform bg-opacity-20 text-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="white">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 110 2h-1v12a2 2 0 01-2-2V6H3a1 1 0 110-2h4zM9 6v10h6V6H9z"></path>
+                        <div
+                            class="w-16 h-16 theme-primary rounded-lg flex items-center justify-center mr-6 group-hover:scale-110 transition-transform bg-opacity-20 text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24"
+                                stroke="white">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 110 2h-1v12a2 2 0 01-2-2V6H3a1 1 0 110-2h4zM9 6v10h6V6H9z">
+                                </path>
                             </svg>
                         </div>
                         <div>
                             <h3 class="text-xl font-semibold mb-2">Manage Movies</h3>
                             <p class="theme-text-secondary">Edit and organize movie collections</p>
-                            <div class="mt-2 text-primary font-semibold text-sm">{{ system_stats.movies|default(0) }} movies</div>
+                            <div class="mt-2 text-primary font-semibold text-sm">{{ system_stats.movies|default(0) }}
+                                movies</div>
                         </div>
                     </div>
                 </a>
 
-                <a href="/media/manage?media_type=tv" class="block theme-card rounded-xl p-8 shadow-xl hover:shadow-2xl transition-all group">
+                <a href="/media/manage?media_type=tv"
+                    class="block theme-card rounded-xl p-8 shadow-xl hover:shadow-2xl transition-all group">
                     <div class="flex items-center">
-                        <div class="w-16 h-16 theme-primary rounded-lg flex items-center justify-center mr-6 group-hover:scale-110 transition-transform bg-opacity-20 text-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="white">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        <div
+                            class="w-16 h-16 theme-primary rounded-lg flex items-center justify-center mr-6 group-hover:scale-110 transition-transform bg-opacity-20 text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24"
+                                stroke="white">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                </path>
                             </svg>
                         </div>
                         <div>
                             <h3 class="text-xl font-semibold mb-2">Manage TV Shows</h3>
                             <p class="theme-text-secondary">Edit and organize TV series</p>
-                            <div class="mt-2 text-primary font-semibold text-sm">{{ system_stats.tv_shows|default(0) }} shows</div>
+                            <div class="mt-2 text-primary font-semibold text-sm">{{ system_stats.tv_shows|default(0) }}
+                                shows</div>
                         </div>
                     </div>
                 </a>
 
-                <a href="/stremio" class="block theme-card rounded-xl p-8 shadow-xl hover:shadow-2xl transition-all group">
+                <a href="/stremio"
+                    class="block theme-card rounded-xl p-8 shadow-xl hover:shadow-2xl transition-all group">
                     <div class="flex items-center">
-                        <div class="w-16 h-16 theme-primary rounded-lg flex items-center justify-center mr-6 group-hover:scale-110 transition-transform bg-opacity-20 text-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="white">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        <div
+                            class="w-16 h-16 theme-primary rounded-lg flex items-center justify-center mr-6 group-hover:scale-110 transition-transform bg-opacity-20 text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24"
+                                stroke="white">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                </path>
                             </svg>
                         </div>
                         <div>
@@ -185,9 +221,13 @@
         <!-- Access Management Section -->
         <div class="theme-card rounded-xl p-8 shadow-xl">
             <div class="text-center mb-8">
-                <div class="w-16 h-16 theme-primary rounded-full flex items-center justify-center mx-auto mb-4 bg-opacity-20 text-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="white">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11.536 16.464l-4.786 1.768a3 3 0 01-3.951-3.951l1.768-4.786L14.464 11.536A6 6 0 0121 9z"></path>
+                <div
+                    class="w-16 h-16 theme-primary rounded-full flex items-center justify-center mx-auto mb-4 bg-opacity-20 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24"
+                        stroke="white">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11.536 16.464l-4.786 1.768a3 3 0 01-3.951-3.951l1.768-4.786L14.464 11.536A6 6 0 0121 9z">
+                        </path>
                     </svg>
                 </div>
                 <h3 class="text-2xl font-bold mb-2">Access Management</h3>
@@ -196,15 +236,39 @@
 
             <!-- Create Token Form -->
             <div class="mb-8">
-                <form onsubmit="createToken(event)" class="flex gap-4">
-                    <input type="text" id="token-name" placeholder="Enter token name (e.g., Family iPad)" required
-                        class="flex-1 theme-card border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-primary">
-                    <button type="submit" 
-                        class="theme-primary text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-colors duration-200 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                <form onsubmit="createToken(event)" class="flex flex-col md:flex-row gap-4 items-end">
+                    <div class="flex-1 w-full">
+                        <label class="block text-sm font-medium theme-text-secondary mb-1">Token Name</label>
+                        <input type="text" id="token-name" placeholder="E.g., Family iPad" required
+                            class="w-full theme-card border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-primary">
+                    </div>
+
+                    <div class="w-full md:w-32">
+                        <label class="block text-sm font-medium theme-text-secondary mb-1">Daily Limit</label>
+                        <div class="relative">
+                            <input type="number" id="daily-limit" placeholder="GB" step="0.1" min="0"
+                                class="w-full theme-card border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-primary">
+                            <span class="absolute right-3 top-3 text-gray-400 text-sm">GB</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-32">
+                        <label class="block text-sm font-medium theme-text-secondary mb-1">Monthly Limit</label>
+                        <div class="relative">
+                            <input type="number" id="monthly-limit" placeholder="GB" step="0.1" min="0"
+                                class="w-full theme-card border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-primary">
+                            <span class="absolute right-3 top-3 text-gray-400 text-sm">GB</span>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full md:w-auto theme-primary text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-colors duration-200 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        Create Token
+                        Create
                     </button>
                 </form>
             </div>
@@ -215,29 +279,47 @@
                     <thead>
                         <tr class="border-b border-gray-200">
                             <th class="py-4 px-4 font-semibold theme-text-secondary">Name</th>
+                            <th class="py-4 px-4 font-semibold theme-text-secondary">Usage (Today / Month)</th>
+                            <th class="py-4 px-4 font-semibold theme-text-secondary">Limits (GB)</th>
                             <th class="py-4 px-4 font-semibold theme-text-secondary">Manifest URL</th>
-                            <th class="py-4 px-4 font-semibold theme-text-secondary">Created</th>
                             <th class="py-4 px-4 font-semibold theme-text-secondary text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for token in api_tokens %}
                         <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                            <td class="py-4 px-4 font-medium">{{ token.name }}</td>
-                            <td class="py-4 px-4">
-                                <div class="flex items-center space-x-2">
-                                    <code class="text-sm bg-gray-100 px-2 py-1 rounded theme-text-secondary">.../stremio/{{ token.token }}/manifest.json</code>
-                                    <button onclick="copyUrl('{{ (request.base_url|string).replace('http:', 'https:') }}stremio/{{ token.token }}/manifest.json')" 
-                                        class="text-primary hover:text-opacity-80 p-1" title="Copy URL">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                        </svg>
-                                    </button>
+                            <td class="py-4 px-4 font-medium">
+                                {{ token.name }}<br>
+                                <span class="text-xs theme-text-secondary">{{ token.created_at.strftime('%Y-%m-%d')
+                                    }}</span>
+                            </td>
+                            <td class="py-4 px-4 text-sm">
+                                <span class="block">Today: <span class="font-semibold text-primary"
+                                        data-bytes="{{ token.usage.daily.bytes|default(0) }}"></span></span>
+                                <span class="block text-gray-500">Month: <span
+                                        data-bytes="{{ token.usage.monthly.bytes|default(0) }}"></span></span>
+                            </td>
+                            <td class="py-4 px-4 text-sm">
+                                <div class="text-gray-600">
+                                    D: {{ token.limits.daily_limit_gb if token.limits.daily_limit_gb else '∞' }} <br>
+                                    M: {{ token.limits.monthly_limit_gb if token.limits.monthly_limit_gb else '∞' }}
                                 </div>
                             </td>
-                            <td class="py-4 px-4 theme-text-secondary text-sm">{{ token.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td class="py-4 px-4">
+                                <button
+                                    onclick="copyUrl('{{ (request.base_url|string).replace('http:', 'https:') }}stremio/{{ token.token }}/manifest.json')"
+                                    class="text-primary hover:text-opacity-80 flex items-center space-x-1"
+                                    title="Copy URL">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                    <span class="text-sm underline">Copy Link</span>
+                                </button>
+                            </td>
                             <td class="py-4 px-4 text-right">
-                                <button onclick="revokeToken('{{ token.token }}')" 
+                                <button onclick="revokeToken('{{ token.token }}')"
                                     class="text-red-500 hover:text-red-700 font-medium text-sm px-3 py-1 rounded border border-red-200 hover:bg-red-50 transition-colors">
                                     Revoke
                                 </button>
@@ -245,7 +327,8 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="4" class="py-8 text-center theme-text-secondary">No tokens found. Create one to get started.</td>
+                            <td colspan="5" class="py-8 text-center theme-text-secondary">No tokens found. Create one to
+                                get started.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -253,91 +336,114 @@
             </div>
         </div>
 
-<script>
-async function createToken(event) {
-    event.preventDefault();
-    const nameInput = document.getElementById('token-name');
-    const name = nameInput.value;
-    
-    try {
-        const response = await fetch('/api/tokens', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({name: name})
-        });
-        
-        if (response.ok) {
-            showToast('Token created successfully!');
-            setTimeout(() => window.location.reload(), 1000);
-        } else {
-            const data = await response.json();
-            showToast('Error: ' + data.detail);
-        }
-    } catch (error) {
-        showToast('Error creating token');
-    }
-}
+        <script>
+            async function createToken(event) {
+                event.preventDefault();
+                const nameInput = document.getElementById('token-name');
+                const dailyInput = document.getElementById('daily-limit');
+                const monthlyInput = document.getElementById('monthly-limit');
 
-async function revokeToken(token) {
-    if (!confirm('Are you sure you want to revoke this token? The user will lose access immediately.')) return;
-    
-    try {
-        const response = await fetch('/api/tokens/' + token, {
-            method: 'DELETE'
-        });
-        
-        if (response.ok) {
-            showToast('Token revoked successfully!');
-            setTimeout(() => window.location.reload(), 1000);
-        } else {
-            showToast('Error revoking token');
-        }
-    } catch (error) {
-        showToast('Error revoking token');
-    }
-}
+                const payload = {
+                    name: nameInput.value,
+                    daily_limit_gb: dailyInput.value,
+                    monthly_limit_gb: monthlyInput.value
+                };
 
-function copyUrl(url) {
-    navigator.clipboard.writeText(url).then(function() {
-        showToast('Manifest URL copied to clipboard!');
-    });
-}
-</script>
+                try {
+                    const response = await fetch('/api/tokens', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        showToast('Token created successfully!');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        const data = await response.json();
+                        showToast('Error: ' + data.detail);
+                    }
+                } catch (error) {
+                    showToast('Error creating token');
+                }
+            }
+
+            async function revokeToken(token) {
+                if (!confirm('Are you sure you want to revoke this token? The user will lose access immediately.')) return;
+
+                try {
+                    const response = await fetch('/api/tokens/' + token, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        showToast('Token revoked successfully!');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showToast('Error revoking token');
+                    }
+                } catch (error) {
+                    showToast('Error revoking token');
+                }
+            }
+
+            function copyUrl(url) {
+                navigator.clipboard.writeText(url).then(function () {
+                    showToast('Manifest URL copied to clipboard!');
+                });
+            }
+        </script>
     </main>
 </div>
 
 <script>
-function copyToClipboard() {
-    const manifestUrl = document.getElementById('manifest-url').value;
-    navigator.clipboard.writeText(manifestUrl).then(function() {
-        showToast('Manifest URL copied to clipboard!');
-    });
-}
-
-function showToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'fixed top-4 right-4 theme-primary text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => toast.classList.remove('translate-x-full'), 100);
-    setTimeout(() => {
-        toast.classList.add('translate-x-full');
-        setTimeout(() => document.body.removeChild(toast), 300);
-    }, 3000);
-}
-
-function toggleAccordion(id) {
-    const content = document.getElementById(id);
-    const icon = document.getElementById(id + '-icon');
-    
-    if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        icon.classList.add('rotate-180');
-    } else {
-        content.classList.add('hidden');
-        icon.classList.remove('rotate-180');
+    function copyToClipboard() {
+        const manifestUrl = document.getElementById('manifest-url').value;
+        navigator.clipboard.writeText(manifestUrl).then(function () {
+            showToast('Manifest URL copied to clipboard!');
+        });
     }
-}
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 right-4 theme-primary text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => document.body.removeChild(toast), 300);
+        }, 3000);
+    }
+
+    function toggleAccordion(id) {
+        const content = document.getElementById(id);
+        const icon = document.getElementById(id + '-icon');
+
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            icon.classList.add('rotate-180');
+        } else {
+            content.classList.add('hidden');
+            icon.classList.remove('rotate-180');
+        }
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (!+bytes) return '0 B';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+    }
+
+    // Auto-format bytes on load
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('[data-bytes]').forEach(el => {
+            el.textContent = formatBytes(el.getAttribute('data-bytes'));
+        });
+    });
 </script>
 {% endblock %}

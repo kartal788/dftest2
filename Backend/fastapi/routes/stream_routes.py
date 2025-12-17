@@ -1,6 +1,8 @@
 import math
 import secrets
 import mimetypes
+import time
+from Backend import db
 from typing import Tuple
 from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import StreamingResponse
@@ -85,8 +87,33 @@ async def media_streamer(
     req_length = until_bytes - from_bytes + 1
     part_count = math.ceil(until_bytes / chunk_size) - math.floor(offset / chunk_size)
 
-    body = tg_connect.yield_file(
-        file_id, index, offset, first_part_cut, last_part_cut, part_count, chunk_size
+    
+    # Wrapper to count bytes and limit usage
+    async def stream_generator(file_stream, token):
+        start_time = time.time()
+        byte_count = 0
+        update_interval = 120  # 2 minutes
+
+        async for chunk in file_stream:
+            yield chunk
+            byte_count += len(chunk)
+            
+            # Check interval
+            if (time.time() - start_time) > update_interval:
+                if byte_count > 0:
+                     await db.update_token_usage(token, byte_count)
+                     byte_count = 0
+                start_time = time.time() # Reset timer
+        
+        # Final update
+        if byte_count > 0:
+            await db.update_token_usage(token, byte_count)
+
+    body = stream_generator(
+        tg_connect.yield_file(
+            file_id, index, offset, first_part_cut, last_part_cut, part_count, chunk_size
+        ),
+        request.path_params.get("token") # Get token from path
     )
 
     file_name = file_id.file_name or f"{secrets.token_hex(2)}.unknown"

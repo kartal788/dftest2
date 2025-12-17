@@ -1,7 +1,8 @@
+
 from asyncio import create_task
 from bson import ObjectId
 import motor.motor_asyncio
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pydantic import ValidationError
 from pymongo import ASCENDING, DESCENDING
 from typing import Dict, List, Optional, Tuple, Any
@@ -814,7 +815,7 @@ class Database:
     # API Token Methods
     # -------------------------------
 
-    async def add_api_token(self, name: str) -> dict:
+    async def add_api_token(self, name: str, daily_limit_gb: float = None, monthly_limit_gb: float = None) -> dict:
         """Generates a random alphanumeric token (min 20 chars) and saves it."""
         alphabet = string.ascii_letters + string.digits
         token = ''.join(secrets.choice(alphabet) for _ in range(32))  # 32 chars > 20 chars
@@ -822,7 +823,16 @@ class Database:
         token_doc = {
             "name": name,
             "token": token,
-            "created_at": datetime.utcnow()
+            "created_at": datetime.utcnow(),
+            "limits": {
+                "daily_limit_gb": daily_limit_gb if daily_limit_gb else 0,
+                "monthly_limit_gb": monthly_limit_gb if monthly_limit_gb else 0
+            },
+            "usage": {
+                "total_bytes": 0,
+                "daily": {"date": datetime.now(timezone.utc).strftime("%Y-%m-%d"), "bytes": 0},
+                "monthly": {"month": datetime.now(timezone.utc).strftime("%Y-%m"), "bytes": 0}
+            }
         }
         
         await self.dbs["tracking"]["api_tokens"].insert_one(token_doc)
@@ -843,6 +853,44 @@ class Database:
         """Deletes a token."""
         result = await self.dbs["tracking"]["api_tokens"].delete_one({"token": token})
         return result.deleted_count > 0
+
+    async def update_token_usage(self, token: str, bytes_delta: int):
+        """Atomically updates token usage statistics, handling day/month rollovers."""
+        today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        month_str = datetime.now(timezone.utc).strftime("%Y-%m")
+        
+        token_doc = await self.dbs["tracking"]["api_tokens"].find_one({"token": token})
+        if not token_doc:
+             return
+
+        # Check for rollovers
+        current_daily = token_doc.get("usage", {}).get("daily", {})
+        if current_daily.get("date") != today_str:
+            # Reset daily
+            await self.dbs["tracking"]["api_tokens"].update_one(
+                {"token": token},
+                {"$set": {"usage.daily": {"date": today_str, "bytes": 0}}}
+            )
+
+        current_monthly = token_doc.get("usage", {}).get("monthly", {})
+        if current_monthly.get("month") != month_str:
+            # Reset monthly
+            await self.dbs["tracking"]["api_tokens"].update_one(
+                {"token": token},
+                {"$set": {"usage.monthly": {"month": month_str, "bytes": 0}}}
+            )
+
+        # Increment usage
+        await self.dbs["tracking"]["api_tokens"].update_one(
+            {"token": token},
+            {
+                "$inc": {
+                    "usage.total_bytes": bytes_delta,
+                    "usage.daily.bytes": bytes_delta,
+                    "usage.monthly.bytes": bytes_delta
+                }
+            }
+        )
 
     async def delete_tv_quality(self, tmdb_id: int, db_index: int, season_number: int, episode_number: int, quality: str) -> bool:
         db_key = f"storage_{db_index}"

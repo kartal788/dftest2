@@ -165,13 +165,29 @@ async def delete_tv_season_api(tmdb_id: int, db_index: int, season: int):
 
 # --- Token Management Routes ---
 
-async def create_token_api(name: dict):
+
+async def create_token_api(payload: dict):
     try:
-        token_name = name.get("name")
+        token_name = payload.get("name")
+        daily_limit = payload.get("daily_limit_gb")
+        monthly_limit = payload.get("monthly_limit_gb")
+        
         if not token_name:
              raise HTTPException(status_code=400, detail="Token name is required")
         
-        new_token = await db.add_api_token(token_name)
+        # Convert to float or None
+        def parse_limit(val):
+            try:
+                v = float(val)
+                return v if v > 0 else None
+            except (ValueError, TypeError):
+                return None
+
+        new_token = await db.add_api_token(
+            token_name, 
+            parse_limit(daily_limit), 
+            parse_limit(monthly_limit)
+        )
         return new_token
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
