@@ -94,7 +94,7 @@ async def media_streamer(
     async def stream_generator(file_stream, token):
         start_time = time.time()
         byte_count = 0
-        update_interval = 60  # 1 minute
+        update_interval = 10  # Reduced to 10 seconds for faster feedback
 
         # Extract limits
         limits = token_data.get("limits", {}) if token_data else {}
@@ -119,17 +119,21 @@ async def media_streamer(
             if daily_limit_gb and daily_limit_gb > 0:
                 current_daily_gb = (initial_daily_bytes + session_total) / (1024**3)
                 if current_daily_gb >= daily_limit_gb:
-                    # Update DB before killing
                     if byte_count > 0:
-                        await db.update_token_usage(token, byte_count)
-                    # Stop stream
+                        try:
+                            await db.update_token_usage(token, byte_count)
+                        except Exception as e:
+                            print(f"[Stream-Error] DB Usage Update Failed: {e}")
                     return
 
             if monthly_limit_gb and monthly_limit_gb > 0:
                 current_monthly_gb = (initial_monthly_bytes + session_total) / (1024**3)
                 if current_monthly_gb >= monthly_limit_gb:
                     if byte_count > 0:
-                        await db.update_token_usage(token, byte_count)
+                        try:
+                            await db.update_token_usage(token, byte_count)
+                        except Exception as e:
+                            print(f"[Stream-Error] DB Usage Update Failed: {e}")
                     return
 
             yield chunk
@@ -137,13 +141,20 @@ async def media_streamer(
             # Check interval
             if (time.time() - start_time) > update_interval:
                 if byte_count > 0:
-                     await db.update_token_usage(token, byte_count)
-                     byte_count = 0
+                     try:
+                        await db.update_token_usage(token, byte_count)
+                        # print(f"[Stream-Debug] Updated usage for {token}: {byte_count} bytes")
+                        byte_count = 0
+                     except Exception as e:
+                        print(f"[Stream-Error] Periodic Usage Update Failed: {e}")
                 start_time = time.time() # Reset timer
         
         # Final update
         if byte_count > 0:
-            await db.update_token_usage(token, byte_count)
+            try:
+                await db.update_token_usage(token, byte_count)
+            except Exception as e:
+                print(f"[Stream-Error] Final Usage Update Failed: {e}")
 
     body = stream_generator(
         tg_connect.yield_file(
