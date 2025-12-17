@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <h1 class="text-3xl font-bold text-primary">System Overview</h1>
+                    <h1 class="text-3xl font-bold text-primary">Dashboard</h1>
                 </div>
                 <button onclick="refreshSystemStats()"
                     class="flex items-center space-x-2 px-4 py-2 rounded-lg theme-primary text-white hover:opacity-90 transition-all shadow-md active:scale-95 group focus:outline-none"
@@ -110,10 +110,10 @@
 <!-- Database Statistics Section -->
 <div class="mb-12">
     <h2 class="text-2xl font-bold mb-6 text-center">Database Overview</h2>
-    <div class="flex flex-wrap justify-center gap-6">
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% if system_stats.databases %}
         {% for db_stat in system_stats.databases %}
-        <div class="theme-card rounded-xl p-6 shadow-xl w-full md:w-96">
+        <div class="theme-card rounded-xl p-6 shadow-xl w-full">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold">{{ db_stat.db_name.replace("storage_", "Database ") }}</h3>
                 <div
@@ -154,7 +154,7 @@
         {% endfor %}
 
         <!-- Admin Operations Card -->
-        <div class="theme-card rounded-xl p-6 shadow-xl w-full md:w-96">
+        <div class="theme-card rounded-xl p-6 shadow-xl w-full">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold">Admin Operations</h3>
                 <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center text-red-600">
@@ -252,23 +252,7 @@
             </div>
         </a>
 
-        <a href="/stremio" class="block theme-card rounded-xl p-8 shadow-xl hover:shadow-2xl transition-all group">
-            <div class="flex items-center">
-                <div
-                    class="w-16 h-16 theme-primary rounded-lg flex items-center justify-center mr-6 group-hover:scale-110 transition-transform bg-opacity-20 text-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24"
-                        stroke="white">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
-                        </path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-xl font-semibold mb-2">Stremio Setup</h3>
-                    <p class="theme-text-secondary">Configure addon installation</p>
-                </div>
-            </div>
-        </a>
+
     </div>
 </div>
 
