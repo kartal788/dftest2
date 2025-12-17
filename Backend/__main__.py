@@ -41,7 +41,7 @@ async def start_services():
         LOGGER.info('Initializing Telegram-Stremio Web Server...')
         await restart_notification()
         loop.create_task(server.serve())
-        loop.create_task(ping())
+        # loop.create_task(ping())
         
         LOGGER.info("Telegram-Stremio Started Successfully!")
         await idle()
