@@ -13,14 +13,12 @@ from Backend.fastapi.routes.template_routes import (
     media_management_page, edit_media_page, public_status_page, stremio_guide_page
 )
 from Backend.fastapi.routes.api_routes import (
-    list_media_api, delete_media_api, update_media_api
-)
-from Backend.fastapi.routes.admin_routes import (
-    router as admin_router,
+    list_media_api, delete_media_api, update_media_api,
     delete_movie_quality_api, delete_tv_quality_api,
     delete_tv_episode_api, delete_tv_season_api,
     create_token_api, revoke_token_api, update_token_limits_api
 )
+from Backend.fastapi.routes.admin_routes import router as admin_router
 
 app = FastAPI(
     title="Telegram Stremio Media Server",
