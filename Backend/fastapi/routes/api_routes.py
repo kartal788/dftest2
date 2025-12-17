@@ -1,7 +1,35 @@
 from fastapi import Request, Query, HTTPException
-from Backend import db
+from Backend import db, StartTime, __version__
+from Backend.pyrofork.bot import work_loads, multi_clients, StreamBot
+from Backend.helper.pyro import get_readable_time
+from time import time
 
 # --- API Routes for Media Management ---
+
+async def get_system_stats_api():
+    try:
+        db_stats = await db.get_database_stats()
+        total_movies = sum(stat.get("movie_count", 0) for stat in db_stats)
+        total_tv_shows = sum(stat.get("tv_count", 0) for stat in db_stats)
+        
+        return {
+            "server_status": "running",
+            "uptime": get_readable_time(time() - StartTime),
+            "telegram_bot": f"@{StreamBot.username}" if StreamBot and StreamBot.username else "@StreamBot",
+            "connected_bots": len(multi_clients),
+            "version": __version__,
+            "movies": total_movies,
+            "tv_shows": total_tv_shows,
+            "databases": db_stats,
+            "total_databases": len(db_stats),
+            "current_db_index": db.current_db_index
+        }
+    except Exception as e:
+        print(f"System Stats API Error: {e}")
+        return {
+            "server_status": "error", 
+            "error": str(e)
+        }
 
 async def list_media_api(
     media_type: str = Query("movie", regex="^(movie|tv)$"),
@@ -230,3 +258,31 @@ async def revoke_token_api(token: str):
             raise HTTPException(status_code=404, detail="Token not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+async def get_bot_status_api():
+    try:
+        from Backend.pyrofork.bot import work_loads, multi_clients
+        
+        bot_status = []
+        for index, client in multi_clients.items():
+            # Get current load, default to 0
+            load = work_loads.get(index, 0)
+            
+            # Use 'me.first_name' if available, else a generic name
+            name = getattr(client.me, "first_name", f"Bot {index}") if client.me else f"Bot {index}"
+            username = getattr(client.me, "username", "Unknown") if client.me else "Unknown"
+            
+            bot_status.append({
+                "index": index,
+                "name": name,
+                "username": username,
+                "load": load
+            })
+            
+        # Sort by load descending
+        bot_status.sort(key=lambda x: x["load"], reverse=True)
+        return bot_status
+    except Exception as e:
+        # If accessing client.me fails (e.g. client not started), handle gracefully
+        print(f"Error fetching bot status: {e}")
+        return []

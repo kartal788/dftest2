@@ -131,20 +131,15 @@ async def revoke_token(token: str, _: bool = Depends(require_auth)):
     return await revoke_token_api(token)
 
 
-@app.get("/api/system/workloads")
-async def get_workloads(_: bool = Depends(require_auth)):
-    try:
-        from Backend.pyrofork.bot import work_loads
-        return {
-            "loads": {
-                f"bot{c + 1}": l
-                for c, (_, l) in enumerate(
-                    sorted(work_loads.items(), key=lambda x: x[1], reverse=True)
-                )
-            } if work_loads else {}
-        }
-    except Exception as e:
-        return {"loads": {}}
+@app.get("/api/bots")
+async def get_bot_status(_: bool = Depends(require_auth)):
+    from Backend.fastapi.routes.api_routes import get_bot_status_api
+    return await get_bot_status_api()
+
+@app.get("/api/system/stats")
+async def get_system_stats(_: bool = Depends(require_auth)):
+    from Backend.fastapi.routes.api_routes import get_system_stats_api
+    return await get_system_stats_api()
 
 
 @app.exception_handler(401)

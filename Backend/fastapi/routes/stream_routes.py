@@ -92,69 +92,78 @@ async def media_streamer(
     
     # Wrapper to count bytes and limit usage
     async def stream_generator(file_stream, token):
-        start_time = time.time()
-        byte_count = 0
-        update_interval = 10  # Reduced to 10 seconds for faster feedback
-
-        # Extract limits
-        limits = token_data.get("limits", {}) if token_data else {}
-        usage = token_data.get("usage", {}) if token_data else {}
+        # Increment workload for this client
+        work_loads[index] += 1
         
-        daily_limit_gb = limits.get("daily_limit_gb")
-        monthly_limit_gb = limits.get("monthly_limit_gb")
-        
-        # Initial usage (Bytes)
-        initial_daily_bytes = usage.get("daily", {}).get("bytes", 0)
-        initial_monthly_bytes = usage.get("monthly", {}).get("bytes", 0)
-        
-        # Session accumulator for limit checking
-        session_total = 0
-
-        async for chunk in file_stream:
-            chunk_len = len(chunk)
-            byte_count += chunk_len
-            session_total += chunk_len
+        try:
+            start_time = time.time()
+            byte_count = 0
+            update_interval = 10  # Reduced to 10 seconds for faster feedback
+    
+            # Extract limits
+            limits = token_data.get("limits", {}) if token_data else {}
+            usage = token_data.get("usage", {}) if token_data else {}
             
-            # Check Limits (Enforce loop)
-            if daily_limit_gb and daily_limit_gb > 0:
-                current_daily_gb = (initial_daily_bytes + session_total) / (1024**3)
-                if current_daily_gb >= daily_limit_gb:
-                    if byte_count > 0:
-                        try:
-                            await db.update_token_usage(token, byte_count)
-                        except Exception as e:
-                            print(f"[Stream-Error] DB Usage Update Failed: {e}")
-                    return
-
-            if monthly_limit_gb and monthly_limit_gb > 0:
-                current_monthly_gb = (initial_monthly_bytes + session_total) / (1024**3)
-                if current_monthly_gb >= monthly_limit_gb:
-                    if byte_count > 0:
-                        try:
-                            await db.update_token_usage(token, byte_count)
-                        except Exception as e:
-                            print(f"[Stream-Error] DB Usage Update Failed: {e}")
-                    return
-
-            yield chunk
+            daily_limit_gb = limits.get("daily_limit_gb")
+            monthly_limit_gb = limits.get("monthly_limit_gb")
             
-            # Check interval
-            if (time.time() - start_time) > update_interval:
-                if byte_count > 0:
-                     try:
-                        await db.update_token_usage(token, byte_count)
-                        # print(f"[Stream-Debug] Updated usage for {token}: {byte_count} bytes")
-                        byte_count = 0
-                     except Exception as e:
-                        print(f"[Stream-Error] Periodic Usage Update Failed: {e}")
-                start_time = time.time() # Reset timer
-        
-        # Final update
-        if byte_count > 0:
-            try:
-                await db.update_token_usage(token, byte_count)
-            except Exception as e:
-                print(f"[Stream-Error] Final Usage Update Failed: {e}")
+            # Initial usage (Bytes)
+            initial_daily_bytes = usage.get("daily", {}).get("bytes", 0)
+            initial_monthly_bytes = usage.get("monthly", {}).get("bytes", 0)
+            
+            # Session accumulator for limit checking
+            session_total = 0
+    
+            async for chunk in file_stream:
+                chunk_len = len(chunk)
+                byte_count += chunk_len
+                session_total += chunk_len
+                
+                # Check Limits (Enforce loop)
+                if daily_limit_gb and daily_limit_gb > 0:
+                    current_daily_gb = (initial_daily_bytes + session_total) / (1024**3)
+                    if current_daily_gb >= daily_limit_gb:
+                        if byte_count > 0:
+                            try:
+                                await db.update_token_usage(token, byte_count)
+                            except Exception as e:
+                                print(f"[Stream-Error] DB Usage Update Failed: {e}")
+                        return
+    
+                if monthly_limit_gb and monthly_limit_gb > 0:
+                    current_monthly_gb = (initial_monthly_bytes + session_total) / (1024**3)
+                    if current_monthly_gb >= monthly_limit_gb:
+                        if byte_count > 0:
+                            try:
+                                await db.update_token_usage(token, byte_count)
+                            except Exception as e:
+                                print(f"[Stream-Error] DB Usage Update Failed: {e}")
+                        return
+    
+                yield chunk
+                
+                # Check interval
+                if (time.time() - start_time) > update_interval:
+                    if byte_count > 0:
+                         try:
+                            await db.update_token_usage(token, byte_count)
+                            # print(f"[Stream-Debug] Updated usage for {token}: {byte_count} bytes")
+                            byte_count = 0
+                         except Exception as e:
+                            print(f"[Stream-Error] Periodic Usage Update Failed: {e}")
+                    start_time = time.time() # Reset timer
+            
+            # Final update
+            if byte_count > 0:
+                try:
+                    await db.update_token_usage(token, byte_count)
+                except Exception as e:
+                    print(f"[Stream-Error] Final Usage Update Failed: {e}")
+
+        finally:
+            # Decrement workload when stream ends or fails
+            if index in work_loads and work_loads[index] > 0:
+                work_loads[index] -= 1
 
     body = stream_generator(
         tg_connect.yield_file(
