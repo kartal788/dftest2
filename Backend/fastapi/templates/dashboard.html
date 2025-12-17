@@ -719,7 +719,7 @@
         });
     }
 
-    function showToast(message) {
+    function showToast(message, duration = 3000) {
         const toast = document.createElement('div');
         toast.className = 'fixed top-4 right-4 theme-primary text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
         toast.textContent = message;
@@ -729,7 +729,7 @@
         setTimeout(() => {
             toast.classList.add('translate-x-full');
             setTimeout(() => document.body.removeChild(toast), 300);
-        }, 3000);
+        }, duration);
     }
 
     function toggleAccordion(id) {
@@ -786,15 +786,22 @@
 
                 // Special handling for update action to show commit info
                 if (action === 'update') {
-                    let updateMessage = data.message || 'Update completed';
+                    // Show main update message
+                    showToast(data.message || 'Update completed');
+
+                    // Show commit message if available
                     if (data.commit_message) {
-                        updateMessage += `\n\nLatest commit: ${data.commit_message}`;
+                        setTimeout(() => {
+                            showToast('Latest commit: ' + data.commit_message, 5000);
+                        }, 1000);
                     }
+
+                    // Show note about restart if available
                     if (data.note) {
-                        updateMessage += `\n\n${data.note}`;
+                        setTimeout(() => {
+                            showToast(data.note, 4000);
+                        }, 2000);
                     }
-                    alert(updateMessage);
-                    showToast(data.message);
                 } else {
                     showToast(data.message || 'Action initiated successfully');
 
