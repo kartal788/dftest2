@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from Backend.fastapi.routes.auth_routes import get_current_user
+from Backend.fastapi.security.credentials import get_current_user
 from Backend.helper.metadata_manager import metadata_manager
 
 router = APIRouter()
