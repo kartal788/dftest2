@@ -306,7 +306,7 @@ async def get_streams(token: str, media_type: str, id: str, token_data: dict = D
         )
         return {
             "streams": [{
-                "name": "Limit Reached",
+                "name": "Sınıra Ulaşıldı",
                 "title": title,
                 "url": token_data["limit_video"]
             }]
