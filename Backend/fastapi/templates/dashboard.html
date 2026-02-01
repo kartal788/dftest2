@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Telegram Stremio{% endblock %}
+{% block title %}Ana Sayfa{% endblock %}
 
 {% block content %}
 <div class="min-h-screen">
@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <h1 class="text-3xl font-bold text-primary">Dashboard</h1>
+                    <h1 class="text-3xl font-bold text-primary">Kontrol Paneli</h1>
                 </div>
                 <button onclick="refreshSystemStats()"
                     class="flex items-center space-x-2 px-4 py-2 rounded-lg theme-primary text-white hover:opacity-90 transition-all shadow-md active:scale-95 group focus:outline-none"
@@ -20,7 +20,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span class="font-medium">Refresh Data</span>
+                    <span class="font-medium">Verileri Yenile</span>
                 </button>
             </div>
         </div>
@@ -42,12 +42,12 @@
                                 </path>
                             </svg>
                         </div>
-                        <h3 class="text-2xl font-semibold">System Status</h3>
+                        <h3 class="text-2xl font-semibold">Sistem Durumu</h3>
                     </div>
 
                     <div class="space-y-4">
                         <div class="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
-                            <span class="font-medium theme-text-secondary">Uptime</span>
+                            <span class="font-medium theme-text-secondary">Çalışma süresi</span>
                             <span id="sys-uptime" class="text-primary font-semibold">{{ system_stats.uptime or 'N/A'
                                 }}</span>
                         </div>
@@ -58,7 +58,7 @@
                                 }}</span>
                         </div>
                         <div class="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
-                            <span class="font-medium theme-text-secondary">Connected Bots</span>
+                            <span class="font-medium theme-text-secondary">Bağlı Botlar</span>
                             <span id="sys-bots-count" class="text-primary font-semibold">{{
                                 system_stats.connected_bots|default(0) }}</span>
                         </div>
@@ -82,10 +82,10 @@
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="text-2xl font-semibold">Live Streaming Status</h3>
+                                <h3 class="text-2xl font-semibold">Canlı Yayın Durumu</h3>
                             </div>
                             <span class="px-3 py-1 bg-red-500 text-white rounded-full text-sm font-semibold">
-                                {{ system_stats.total_active_streams }} Active
+                                {{ system_stats.total_active_streams }} Aktif
                             </span>
                         </div>
 
@@ -98,7 +98,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M8 5v14l11-7z"/>
                                             </svg>
-                                            <span class="font-medium theme-text-secondary">Stream:</span>
+                                            <span class="font-medium theme-text-secondary">Aktarım:</span>
                                             <span class="font-semibold">{{ stream.stream_id[:8] }}...</span>
                                         </div>
                                         <span class="px-2 py-1 rounded text-xs font-semibold {% if stream.status == 'active' %}bg-green-100 text-green-800{% elif stream.status == 'cancelled' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
@@ -112,31 +112,31 @@
                                             <span class="text-sm font-semibold">Bot{{ stream.client_index + 1 }} </span>
                                         </div>
                                         <div class="flex justify-between py-2 px-3 bg-white rounded">
-                                            <span class="text-sm theme-text-secondary">File:</span>
+                                            <span class="text-sm theme-text-secondary">Dosya:</span>
                                             <span class="text-sm font-semibold">DC{{ stream.dc_id }}</span>
                                         </div>
                                         <div class="flex justify-between py-2 px-3 bg-white rounded col-span-2">
-                                            <span class="text-sm theme-text-secondary">Duration:</span>
+                                            <span class="text-sm theme-text-secondary">Süre:</span>
                                             <span class="text-sm font-semibold">{{ stream.duration }}s</span>
                                         </div>
                                         
                                         <div class="flex justify-between py-2 px-3 bg-white rounded col-span-2">
-                                            <span class="text-sm theme-text-secondary">Data Transferred:</span>
+                                            <span class="text-sm theme-text-secondary">Aktarılan Veriler:</span>
                                             <span class="text-sm font-semibold">{{ "%.2f"|format(stream.total_bytes / 1024 / 1024) }} MB</span>
                                         </div>
                                     </div>
 
                                     <div class="grid grid-cols-3 gap-3">
                                         <div class="text-center py-3 bg-white rounded">
-                                            <div class="text-xs theme-text-secondary mb-1">Instant</div>
+                                            <div class="text-xs theme-text-secondary mb-1">Şu an</div>
                                             <div class="text-sm font-bold text-primary">{{ stream.instant_mbps }} MB/s</div>
                                         </div>
                                         <div class="text-center py-3 bg-white rounded">
-                                            <div class="text-xs theme-text-secondary mb-1">Average</div>
+                                            <div class="text-xs theme-text-secondary mb-1">Ortalama</div>
                                             <div class="text-sm font-bold text-primary">{{ stream.avg_mbps }} MB/s</div>
                                         </div>
                                         <div class="text-center py-3 bg-white rounded">
-                                            <div class="text-xs theme-text-secondary mb-1">Peak</div>
+                                            <div class="text-xs theme-text-secondary mb-1">En yüksek</div>
                                             <div class="text-sm font-bold text-primary">{{ stream.peak_mbps }} MB/s</div>
                                         </div>
                                     </div>
@@ -160,8 +160,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
-                                    <p class="text-gray-500 font-medium mb-1">No active streams</p>
-                                    <p class="text-gray-400 text-sm">Streams will appear here when users start watching content</p>
+                                    <p class="text-gray-500 font-medium mb-1">Etkin akış yok</p>
+                                    <p class="text-gray-400 text-sm">Kullanıcılar içerik izlemeye başladığında yayınlar burada görünecektir.</p>
                                 </div>
                             {% endif %}
                         </div>
@@ -172,7 +172,7 @@
 
         <!-- Database Statistics Section -->
         <div class="mb-8 mt-4">
-            <h2 class="text-2xl font-bold mb-6 text-center">Database and Commands</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center">Veritabanı ve Komutlar</h2>
             <div class="grid lg:grid-cols-2 gap-6">
                 {% if system_stats.databases %}
                 {% for db_stat in system_stats.databases %}
@@ -192,19 +192,19 @@
 
                     <div class="space-y-4 flex-grow">
                         <div class="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
-                            <span class="font-medium theme-text-secondary">Movies</span>
+                            <span class="font-medium theme-text-secondary">Filmler</span>
                             <span id="db-movies-{{ loop.index0 }}" class="text-primary font-semibold">{{
                                 "{:,}".format(db_stat.movie_count) }}</span>
                         </div>
                         <div class="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
-                            <span class="font-medium theme-text-secondary">TV Shows</span>
+                            <span class="font-medium theme-text-secondary">Diziler</span>
                             <span id="db-tv-{{ loop.index0 }}" class="text-primary font-semibold">{{
                                 "{:,}".format(db_stat.tv_count) }}</span>
                         </div>
 
                         <div class="py-3 px-4 bg-gray-50 rounded-lg">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="font-medium theme-text-secondary">Storage Used</span>
+                                <span class="font-medium theme-text-secondary">Kullanılan Depolama</span>
                                 <span id="db-storage-{{ loop.index0 }}" class="text-primary font-semibold text-sm">{{
                                     "%.1f"|format(db_stat.storageSize /
                                     1024 / 1024) }} MB</span>
@@ -219,7 +219,7 @@
                 </div>
                 {% endfor %}
                 {% else %}
-    <div class="col-span-full text-center theme-text-secondary py-8">No database statistics available</div>
+    <div class="col-span-full text-center theme-text-secondary py-8">Veritabanı istatistikleri mevcut değil</div>
 {% endif %}  <!-- Add this closing tag -->
 </div>
         </div>
@@ -242,10 +242,10 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Manage Movies</h3>
-                            <p class="theme-text-secondary">Edit and organize movie collections</p>
+                            <h3 class="text-xl font-semibold mb-2">Filmleri Yönet</h3>
+                            <p class="theme-text-secondary">Filmleri düzenle</p>
                             <div class="mt-2 text-primary font-semibold text-sm">{{ system_stats.movies|default(0) }}
-                                movies</div>
+                                film</div>
                         </div>
                     </div>
                 </a>
@@ -263,10 +263,10 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Manage TV Shows</h3>
-                            <p class="theme-text-secondary">Edit and organize TV series</p>
+                            <h3 class="text-xl font-semibold mb-2">Dizileri yönet</h3>
+                            <p class="theme-text-secondary">Dizileri düzenle</p>
                             <div class="mt-2 text-primary font-semibold text-sm">{{ system_stats.tv_shows|default(0) }}
-                                shows</div>
+                                Diziler</div>
                         </div>
                     </div>
                 </a>
@@ -285,8 +285,8 @@
                         </path>
                     </svg>
                 </div>
-                <h3 class="text-2xl font-bold mb-2">Access Management</h3>
-                <p class="theme-text-secondary">Manage API tokens for Stremio addon access</p>
+                <h3 class="text-2xl font-bold mb-2">Erişim Yönetimi</h3>
+                <p class="theme-text-secondary">Stremio eklentisine erişim için API jetonlarını yönetin.</p>
             </div>
 
             <!-- Create Token Form -->
@@ -299,7 +299,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        New Token
+                        Yeni jeton
                     </button>
                 </div>
 
@@ -307,13 +307,13 @@
                     class="hidden mt-4 bg-gray-50 p-6 rounded-xl border border-gray-200 transition-all duration-300">
                     <form onsubmit="createToken(event)" class="flex flex-col md:flex-row gap-4 items-end">
                         <div class="flex-1 w-full">
-                            <label class="block text-sm font-medium theme-text-secondary mb-1">Token Name</label>
+                            <label class="block text-sm font-medium theme-text-secondary mb-1">Jeton ismi</label>
                             <input type="text" id="token-name" placeholder="E.g., Family iPad" required
                                 class="w-full theme-card border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-primary">
                         </div>
 
                         <div class="w-full md:w-32">
-                            <label class="block text-sm font-medium theme-text-secondary mb-1">Daily Limit</label>
+                            <label class="block text-sm font-medium theme-text-secondary mb-1">Günlük Limit</label>
                             <div class="relative">
                                 <input type="number" id="daily-limit" placeholder="0" step="0.1" min="0"
                                     class="w-full theme-card border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:border-primary">
@@ -322,7 +322,7 @@
                         </div>
 
                         <div class="w-full md:w-32">
-                            <label class="block text-sm font-medium theme-text-secondary mb-1">Monthly Limit</label>
+                            <label class="block text-sm font-medium theme-text-secondary mb-1">Aylık Limit</label>
                             <div class="relative">
                                 <input type="number" id="monthly-limit" placeholder="0" step="0.1" min="0"
                                     class="w-full theme-card border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:border-primary">
@@ -333,11 +333,11 @@
                         <div class="flex gap-2 w-full md:w-auto">
                             <button type="button" onclick="toggleCreateForm()"
                                 class="w-full md:w-auto bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors duration-200">
-                                Cancel
+                                İptal
                             </button>
                             <button type="submit"
                                 class="w-full md:w-auto theme-primary text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-colors duration-200 flex items-center justify-center">
-                                Create
+                                Oluştur
                             </button>
                         </div>
                     </form>
@@ -349,11 +349,11 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-gray-200">
-                            <th class="py-4 px-4 font-semibold theme-text-secondary">Name</th>
-                            <th class="py-4 px-4 font-semibold theme-text-secondary">Usage (Today / Month)</th>
-                            <th class="py-4 px-4 font-semibold theme-text-secondary">Limits (GB)</th>
-                            <th class="py-4 px-4 font-semibold theme-text-secondary">Manifest URL</th>
-                            <th class="py-4 px-4 font-semibold theme-text-secondary text-right">Actions</th>
+                            <th class="py-4 px-4 font-semibold theme-text-secondary">İsim</th>
+                            <th class="py-4 px-4 font-semibold theme-text-secondary">Kullanım (Günlük / Aylık)</th>
+                            <th class="py-4 px-4 font-semibold theme-text-secondary">Limit (GB)</th>
+                            <th class="py-4 px-4 font-semibold theme-text-secondary">Eklenti adresi</th>
+                            <th class="py-4 px-4 font-semibold theme-text-secondary text-right">Aksiyon</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -407,7 +407,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                                         </svg>
-                                        <span class="underline">Copy Link</span>
+                                        <span class="underline">Adresi kopyala</span>
                                     </button>
                                 </div>
                             </td>
@@ -415,18 +415,17 @@
                                 <button
                                     onclick="openEditModal('{{ token.token }}', '{{ token.limits.daily_limit_gb|default(0) }}', '{{ token.limits.monthly_limit_gb|default(0) }}')"
                                     class="text-blue-500 hover:text-blue-700 font-medium text-sm px-3 py-1 mr-2 rounded border border-blue-200 hover:bg-blue-50 transition-colors">
-                                    Edit
+                                    Düzenle
                                 </button>
                                 <button onclick="revokeToken('{{ token.token }}')"
                                     class="text-red-500 hover:text-red-700 font-medium text-sm px-3 py-1 rounded border border-red-200 hover:bg-red-50 transition-colors">
-                                    Revoke
+                                    Sil
                                 </button>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="5" class="py-8 text-center theme-text-secondary">No tokens found. Create one to
-                                get started.</td>
+                            <td colspan="5" class="py-8 text-center theme-text-secondary">Hiç jeton bulunamadı. Başlamak için bir tane oluşturun.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -437,17 +436,17 @@
         <!-- Edit Limit Modal -->
         <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
             <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-xl transform transition-all">
-                <h3 class="text-lg font-bold mb-4 theme-text-primary">Edit Token Limits</h3>
+                <h3 class="text-lg font-bold mb-4 theme-text-primary">Jeton Sınırlarını Düzenle</h3>
                 <input type="hidden" id="edit-token-id">
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium theme-text-secondary mb-1">Daily Limit (GB)</label>
+                        <label class="block text-sm font-medium theme-text-secondary mb-1">Günlük Limit (GB)</label>
                         <input type="number" id="edit-daily" placeholder="0 for unlimited" step="0.1" min="0"
                             class="w-full theme-card border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium theme-text-secondary mb-1">Monthly Limit (GB)</label>
+                        <label class="block text-sm font-medium theme-text-secondary mb-1">Aylık Limit (GB)</label>
                         <input type="number" id="edit-monthly" placeholder="0 for unlimited" step="0.1" min="0"
                             class="w-full theme-card border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
                     </div>
@@ -455,10 +454,9 @@
 
                 <div class="mt-6 flex justify-end space-x-3">
                     <button onclick="closeEditModal()"
-                        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+                        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">İptal</button>
                     <button onclick="saveTokenLimits()"
-                        class="px-4 py-2 theme-primary text-white rounded-lg hover:opacity-90 transition-colors">Save
-                        Changes</button>
+                        class="px-4 py-2 theme-primary text-white rounded-lg hover:opacity-90 transition-colors">kaydet</button>
                 </div>
             </div>
         </div>
