@@ -365,15 +365,15 @@
                                     }}</span>
                             </td>
                             <td class="py-4 px-4 text-sm">
-                                <span class="block">Today: <span class="font-semibold text-primary"
+                                <span class="block">Bugün: <span class="font-semibold text-primary"
                                         data-bytes="{{ token.usage.daily.bytes|default(0) }}"></span></span>
-                                <span class="block text-gray-500">Month: <span
+                                <span class="block text-gray-500">Aylık: <span
                                         data-bytes="{{ token.usage.monthly.bytes|default(0) }}"></span></span>
                             </td>
                             <td class="py-4 px-4 text-sm">
                                 <div class="text-gray-600">
                                     <div class="flex items-center gap-1">
-                                        <span class="w-4 text-gray-400">D:</span>
+                                        <span class="w-4 text-gray-400">B:</span>
                                         {% if token.limits.daily_limit_gb %}
                                         <span
                                             data-bytes="{{ (token.limits.daily_limit_gb * 1024 * 1024 * 1024)|int }}"></span>
@@ -382,7 +382,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="flex items-center gap-1">
-                                        <span class="w-4 text-gray-400">M:</span>
+                                        <span class="w-4 text-gray-400">A:</span>
                                         {% if token.limits.monthly_limit_gb %}
                                         <span
                                             data-bytes="{{ (token.limits.monthly_limit_gb * 1024 * 1024 * 1024)|int }}"></span>
@@ -645,7 +645,7 @@
     }
 
     async function revokeToken(token) {
-        if (!confirm('Are you sure you want to revoke this token? The user will lose access immediately.')) return;
+        if (!confirm('Bu jetonu iptal etmek istediğinizden emin misiniz? Kullanıcı erişimini  kaybedecektir.')) return;
 
         try {
             const response = await fetch('/api/tokens/' + token, {
