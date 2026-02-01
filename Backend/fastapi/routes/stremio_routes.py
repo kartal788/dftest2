@@ -126,7 +126,7 @@ async def get_manifest(token: str, token_data: dict = Depends(verify_token)):
             {
                 "type": "movie",
                 "id": "latest_movies",
-                "name": "Latest",
+                "name": "Yeni eklenen",
                 "extra": [
                     {"name": "genre", "isRequired": False, "options": GENRES},
                     {"name": "skip"}
@@ -136,7 +136,7 @@ async def get_manifest(token: str, token_data: dict = Depends(verify_token)):
             {
                 "type": "movie",
                 "id": "top_movies",
-                "name": "Popular",
+                "name": "Popüler",
                 "extra": [
                     {"name": "genre", "isRequired": False, "options": GENRES},
                     {"name": "skip"},
@@ -147,7 +147,7 @@ async def get_manifest(token: str, token_data: dict = Depends(verify_token)):
             {
                 "type": "series",
                 "id": "latest_series",
-                "name": "Latest",
+                "name": "Yeni eklenen",
                 "extra": [
                     {"name": "genre", "isRequired": False, "options": GENRES},
                     {"name": "skip"}
@@ -157,7 +157,7 @@ async def get_manifest(token: str, token_data: dict = Depends(verify_token)):
             {
                 "type": "series",
                 "id": "top_series",
-                "name": "Popular",
+                "name": "Popüler",
                 "extra": [
                     {"name": "genre", "isRequired": False, "options": GENRES},
                     {"name": "skip"},
