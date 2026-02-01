@@ -300,9 +300,9 @@ async def get_streams(token: str, media_type: str, id: str, token_data: dict = D
     if token_data.get("limit_exceeded"):
         limit_type = token_data["limit_exceeded"]
         title = (
-            "🚫 Daily Limit Reached – Upgrade Required"
+            "🚫 Günlük Limit Aşıldı – Yükseltme Gerekli"
             if limit_type == "daily"
-            else "🚫 Monthly Limit Reached – Upgrade Required"
+            else "🚫 Aylık Limit Aşıldı – Yükseltme Gerekli"
         )
         return {
             "streams": [{
