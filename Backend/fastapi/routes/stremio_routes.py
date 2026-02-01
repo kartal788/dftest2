@@ -77,7 +77,7 @@ def format_stream_details(filename: str, quality: str, size: str, file_id: str) 
     if parsed.get("codec"):
         codec_parts.append(f"🎥 {parsed.get('codec')}")
     if parsed.get("bitDepth"):
-        codec_parts.append(f"🌈 {parsed.get('bitDepth')}bit")
+        codec_parts.append(f"🔟 {parsed.get('bitDepth')}bit")
     if parsed.get("audio"):
         codec_parts.append(f"🔊 {parsed.get('audio')}")
     if parsed.get("encoder"):
