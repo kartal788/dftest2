@@ -181,13 +181,119 @@ async def get_manifest(token: str, token_data: dict = Depends(verify_token)):
     }
 
 
+@router.get("/{token}/catalog/{media_type}/{id}/{extra:path}.json")
+@router.get("/{token}/catalog/{media_type}/{id}.json")
+async def get_catalog(token: str, media_type: str, id: str, extra: Optional[str] = None, token_data: dict = Depends(verify_token)):
+    if Telegram.HIDE_CATALOG:
+        raise HTTPException(status_code=404, detail="Catalog disabled")
+
+    if media_type not in ["movie", "series"]:
+        raise HTTPException(status_code=404, detail="Invalid catalog type")
+
+    genre_filter = None
+    search_query = None
+    stremio_skip = 0
+
+    if extra:
+        params = extra.replace("&", "/").split("/")
+        for param in params:
+            if param.startswith("genre="):
+                genre_filter = unquote(param.removeprefix("genre="))
+            elif param.startswith("search="):
+                search_query = unquote(param.removeprefix("search="))
+            elif param.startswith("skip="):
+                try:
+                    stremio_skip = int(param.removeprefix("skip="))
+                except ValueError:
+                    stremio_skip = 0
+
+    page = (stremio_skip // PAGE_SIZE) + 1
+
+    try:
+        if search_query:
+            search_results = await db.search_documents(query=search_query, page=page, page_size=PAGE_SIZE)
+            all_items = search_results.get("results", [])
+            db_media_type = "tv" if media_type == "series" else "movie"
+            items = [item for item in all_items if item.get("media_type") == db_media_type]
+        else:
+            if "latest" in id:
+                sort_params = [("updated_on", "desc")]
+            elif "top" in id:
+                sort_params = [("rating", "desc")]
+            else:
+                sort_params = [("updated_on", "desc")]
+
+            if media_type == "movie":
+                data = await db.sort_movies(sort_params, page, PAGE_SIZE, genre_filter=genre_filter)
+                items = data.get("movies", [])
+            else:
+                data = await db.sort_tv_shows(sort_params, page, PAGE_SIZE, genre_filter=genre_filter)
+                items = data.get("tv_shows", [])
+    except Exception:
+        return {"metas": []}
+
+    metas = [convert_to_stremio_meta(item) for item in items]
+    return {"metas": metas}
+
+
+@router.get("/{token}/meta/{media_type}/{id}.json")
+async def get_meta(token: str, media_type: str, id: str, token_data: dict = Depends(verify_token)):
+    if Telegram.HIDE_CATALOG:
+        raise HTTPException(status_code=404, detail="Catalog disabled")
+
+    imdb_id = id
+    media = await db.get_media_details(imdb_id=imdb_id)
+    if not media:
+        return {"meta": {}}
+
+    meta_obj = {
+        "id": id,
+        "type": "series" if media.get("media_type") == "tv" else "movie",
+        "name": media.get("title", ""),
+        "description": media.get("description", ""),
+        "year": str(media.get("release_year", "")),
+        "imdbRating": str(media.get("rating", "")),
+        "genres": media.get("genres", []),
+        "poster": media.get("poster", ""),
+        "logo": media.get("logo", ""),
+        "background": media.get("backdrop", ""),
+        "imdb_id": media.get("imdb_id", ""),
+        "releaseInfo": str(media.get("release_year", "")),
+        "moviedb_id": media.get("tmdb_id", ""),
+        "cast": media.get("cast") or [],
+        "runtime": media.get("runtime") or "",
+    }
+
+    if media.get("media_type") == "movie":
+        released_date = format_released_date(media)
+        if released_date:
+            meta_obj["released"] = released_date
+
+    if media_type == "series" and "seasons" in media:
+        yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+        videos = []
+
+        for season in sorted(media.get("seasons", []), key=lambda s: s.get("season_number")):
+            for episode in sorted(season.get("episodes", []), key=lambda e: e.get("episode_number")):
+                episode_id = f"{id}:{season['season_number']}:{episode['episode_number']}"
+                videos.append({
+                    "id": episode_id,
+                    "title": episode.get("title", f"Episode {episode['episode_number']}"),
+                    "season": season.get("season_number"),
+                    "episode": episode.get("episode_number"),
+                    "overview": episode.get("overview") or "No description available for this episode yet.",
+                    "released": episode.get("released") or yesterday,
+                    "thumbnail": episode.get("episode_backdrop") or "https://raw.githubusercontent.com/weebzone/Colab-Tools/refs/heads/main/no_episode_backdrop.png",
+                    "imdb_id": episode.get("imdb_id") or media.get("imdb_id"),
+                })
+
+        meta_obj["videos"] = videos
+
+    return {"meta": meta_obj}
+
+
 @router.get("/{token}/stream/{media_type}/{id}.json")
-async def get_streams(
-    token: str,
-    media_type: str,
-    id: str,
-    token_data: dict = Depends(verify_token)
-):
+async def get_streams(token: str, media_type: str, id: str, token_data: dict = Depends(verify_token)):
     if token_data.get("limit_exceeded"):
         limit_type = token_data["limit_exceeded"]
         title = (
@@ -203,13 +309,10 @@ async def get_streams(
             }]
         }
 
-    try:
-        parts = id.split(":")
-        imdb_id = parts[0]
-        season_num = int(parts[1]) if len(parts) > 1 else None
-        episode_num = int(parts[2]) if len(parts) > 2 else None
-    except (ValueError, IndexError):
-        raise HTTPException(status_code=400, detail="Invalid Stremio ID format")
+    parts = id.split(":")
+    imdb_id = parts[0]
+    season_num = int(parts[1]) if len(parts) > 1 else None
+    episode_num = int(parts[2]) if len(parts) > 2 else None
 
     media_details = await db.get_media_details(
         imdb_id=imdb_id,
