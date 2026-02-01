@@ -29,6 +29,7 @@ API_SEMAPHORE = asyncio.Semaphore(12)
 # -------------------------------------------------
 GENRE_TUR_ALIASES = {
   "action": "Aksiyon",
+  "Sci-Fi": "Bilim Kurgu",
   "film-noir": "Kara Film",
   "game-show": "Oyun Gösterisi",
   "short": "Kısa",
