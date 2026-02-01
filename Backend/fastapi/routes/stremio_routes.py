@@ -10,7 +10,7 @@ from Backend.fastapi.security.tokens import verify_token
 
 # --- Configuration ---
 BASE_URL = Telegram.BASE_URL
-ADDON_NAME = "Telegram"
+ADDON_NAME = "Kartal788"
 ADDON_VERSION = __version__
 PAGE_SIZE = 15
 
@@ -164,7 +164,7 @@ async def get_manifest(token: str, token_data: dict = Depends(verify_token)):
         "version": ADDON_VERSION,
         "name": ADDON_NAME,
         "logo": "https://i.postimg.cc/XqWnmDXr/Picsart-25-10-09-08-09-45-867.png",
-        "description": "Streams movies and series from your Telegram.",
+        "description": "Dizi ve film arşivim.",
         "types": ["movie", "series"],
         "resources": resources,
         "catalogs": catalogs,
